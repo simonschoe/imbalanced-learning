@@ -133,10 +133,59 @@ Example:
 
 ---
 
-&lt;img src="https://ml-ops.org/img/ml-engineering.jpg" width="75%" height="75%" style="display: block; margin: auto;" /&gt;
+## Recap: The Generic Machine Learning Pipeline
+
+&lt;img src="https://ml-ops.org/img/ml-engineering.jpg" width="55%" height="55%" style="float:right; padding:10px" style="display: block; margin: auto;" /&gt;
+
+**.yellow[Data Pipeline]:**
+
+&gt;**1 Data ingestion**  
+**2 Data exploration (EDA)**  
+**3 Data wrangling**  
+**4 Data splitting / resampling**
+
+**.red[ML Pipeline]:**
+
+&gt;**5 Model training**  
+**6 Model evaluation / testing**  
+**7 Model packaging**
+
+**.blue[Software &amp; Code Pipeline]:**
+
+&gt;**8 Model deployment**  
+**9 Model performance monitoring**  
+**10 Model performance logging**
+
+.pull-right[Source: [ml-ops.org](https://ml-ops.org/content/end-to-end-ml-workflow)]
+
+???
+1
+- data aquistion: collect data
+- data generation: even generate synthetic data
+- data selection: select relevant data sources
+- data integration: integrate selected data sources
+2
+- data profiling: categorize content and structure, i.e. generate metadata (data type, min, max, average)
+- data validation: learn about data errors
+3
+- clean and transform data (usually most time-consuming step -&gt; also most critical due to gigo-principle), e.g., missing value and outlier handling
+4
+- data split into training, validation, and test datasets
+5
+- feature engineering
+- model estimation
+- hyperparameter tuning
+6 
+7
+- exporting the model to be implementable in a business context (i.e. as part of desktop or mobile application)
+8
+- you feed the model into a production environment so that it becomes part of your daily operations (usabale by the end-user)
+9
+- continuous supervision of the model performance based on unseen data (look for indications that re-training is required in case of data drift)
+10
+- logging of queries and results in a logfile to be usable for re-training
 
 ---
-
 
 ## 3 Techniques for Addressing Class Imbalance
 ### 3.1 Sampling Strategies (*Data Collection* / *Resampling*)

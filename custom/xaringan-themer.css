@@ -58,8 +58,9 @@
   --base: #000000;
   --white: #FFFFFF;
   --black: #272822;
-  --red: #f34213;
-  --green: #008000;
+  --red: #ff7453;
+  --yellow: #f2bd53;
+  --blue: 	#45abc1;
   --white: #FFFFFF;
 }
 
@@ -262,11 +263,17 @@ table.dataTable.hover tbody tr:hover, table.dataTable.display tbody tr:hover {
 .bg-red {
   background-color: var(--red);
 }
-.green {
-  color: var(--green);
+.yellow {
+  color: var(--yellow);
 }
-.bg-green {
-  background-color: var(--green);
+.bg-yellow {
+  background-color: var(--yellow);
+}
+.blue {
+  color: var(--blue);
+}
+.bg-blue {
+  background-color: var(--blue);
 }
 .white {
   color: var(--white);
