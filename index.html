@@ -4,8 +4,8 @@
     <title>Machine Learning in R: Workshop Series</title>
     <meta charset="utf-8" />
     <meta name="author" content="Simon Schölzel" />
-    <link rel="stylesheet" href="custom\xaringan-themer.css" type="text/css" />
-    <link rel="stylesheet" href="custom\custom-theme.css" type="text/css" />
+    <link rel="stylesheet" href="custom/xaringan-themer.css" type="text/css" />
+    <link rel="stylesheet" href="custom/custom-theme.css" type="text/css" />
   </head>
   <body>
     <textarea id="source">
@@ -15,7 +15,7 @@ class: left, middle, inverse, title-slide
 ## Imbalanced Learning
 ### Simon Schölzel
 ### <em>Research Team Berens</em>
-### 2020-08-20 (updated: 2020-10-15)
+### 2020-08-20 (updated: 2020-10-20)
 
 ---
 
@@ -78,15 +78,18 @@ As can be inferred from this quote, the presence of class imbalance depends on t
 - **Minority class:** The underrepresented class which is characterized by relatively few samples.
 
 The relation between the number of samples in the majority vs. minority class is called the **class distribution** and it is often expressed in terms of ratios (e.g., 100:1) or percentages (e.g., 4% vs. 96%).
+&lt;br&gt;&lt;br&gt;&lt;br&gt;
+&lt;img src="img/class-imb.PNG" width="50%" height="50%" style="display: block; margin: auto auto auto 0;" /&gt;
 
-In most practical applications, such as fraud detection, churn prediction or bankruptcy prediction, you are particularly interested in correctly predicting the *minority class*.
+.pull-right[.footnote[
+*Note: In this workshop we focus on class imbalance in the context of classification. Most of the ideas, however, analogously transfer to the realm of regression problems where outliers reflect the minority class.*
 
-.footnote[
-*Note: In this workshop we focus on class imbalance in the context of classification problems. Most of the ideas, however, analogously transfer to the realm of regression problems where outlier reflect the minority class.*
-]
+*Source: "Make your own sample cartoons!" by [Allison Horst](https://github.com/allisonhorst/stats-illustrations).*
+]]
 
 ???
 class distribution for imbalanced data sets: skewed
+In most practical applications, such as fraud detection, churn prediction or bankruptcy prediction, you are particularly interested in correctly predicting the *minority class*.
 
 ---
 
@@ -100,10 +103,10 @@ layout: false
 
 
 .pull-left[
-&lt;img src="index_files/figure-html/unnamed-chunk-2-1.png" width="100%" style="display: block; margin: auto;" /&gt;
+&lt;img src="index_files/figure-html/unnamed-chunk-3-1.png" width="100%" style="display: block; margin: auto;" /&gt;
 ]
 .pull-right[
-**Implication of imbalanced learning regimes:** There are only very few information in the minority class for a model to learn from. This may lead to
+**Implication of imbalanced learning regimes:** There is only very few information in the minority class for a model to learn from. This may lead to
 - an overemphasis of the majority class,
 - poorly calibrated prediction models,
 - a focus on detrimental model candidates.
@@ -139,7 +142,7 @@ Example:
 
 **.yellow[Data Pipeline]:**
 
-&gt;**1 Data ingestion**  
+&gt;**1 &amp;nbsp;Data ingestion**  
 **2 Data exploration (EDA)**  
 **3 Data wrangling**  
 **4 Data splitting / resampling**
@@ -160,7 +163,7 @@ Example:
 
 ???
 1
-- data aquistion: collect data
+- data acquisition: collect data
 - data generation: even generate synthetic data
 - data selection: select relevant data sources
 - data integration: integrate selected data sources
@@ -168,7 +171,7 @@ Example:
 - data profiling: categorize content and structure, i.e. generate metadata (data type, min, max, average)
 - data validation: learn about data errors
 3
-- clean and transform data (usually most time-consuming step -&gt; also most critical due to gigo-principle), e.g., missing value and outlier handling
+- clean and transform data (usually most time-consuming step -&gt; also most critical due to gigo-principle), e.g., missing value and outliers handling
 4
 - data split into training, validation, and test datasets
 5
@@ -212,7 +215,7 @@ comment
 ### 3.1.1 Random Oversampling
 
 .pull-left[
-&lt;img src="index_files/figure-html/unnamed-chunk-5-1.png" width="80%" style="display: block; margin: auto;" /&gt;
+&lt;img src="index_files/figure-html/unnamed-chunk-6-1.png" width="80%" style="display: block; margin: auto;" /&gt;
 ]
 .pull-right[
 **Random oversampling:** Take all cases from the majority class in the training set and complement it by drawing random samples with replacement from the minority class.
@@ -234,7 +237,7 @@ comment
 ### 3.1.2 Synthetic Minority Over-Sampling Technique (SMOTE)
 
 .pull-left[
-&lt;img src="index_files/figure-html/unnamed-chunk-6-1.png" width="80%" style="display: block; margin: auto;" /&gt;
+&lt;img src="index_files/figure-html/unnamed-chunk-7-1.png" width="80%" style="display: block; margin: auto;" /&gt;
 ]
 .pull-right[
 **SMOTE:** Take the minority class and generate additional synthetic samples by using *k-NN*. [[2](#references)]
@@ -244,10 +247,12 @@ comment
 **Algorithm:**
 1. Randomly select original sample (△) from the minority class and its *k* NN.
 2. Create synthetic sample (○) randomly along the vector between the sample and each NN.
-3. Repeat till desired class distribution is reached.
+3. Repeat till desired class distribution is established.
 ]
 
+
 ???
+k-NN: k neareast neighbor algorithm where k is the number of nearest neighbors considered.
 Step 2: i have 4 samples, i.e. 3 nearest neighbours. create 3 synthetic samples and then again select new sample randomly.
 
 ---
@@ -256,7 +261,7 @@ Step 2: i have 4 samples, i.e. 3 nearest neighbours. create 3 synthetic samples 
 ### 3.1.3 Borderline SMOTE
 
 .pull-left[
-&lt;img src="index_files/figure-html/unnamed-chunk-7-1.png" width="80%" style="display: block; margin: auto;" /&gt;
+&lt;img src="index_files/figure-html/unnamed-chunk-8-1.png" width="80%" style="display: block; margin: auto;" /&gt;
 ]
 .pull-right[
 **Three types of samples:**
@@ -278,7 +283,7 @@ Borderline SMOTE focuses on uncertain samples (safe and lost samples are certain
 ### 3.1.4 Random Undersampling
 
 .pull-left[
-&lt;img src="index_files/figure-html/unnamed-chunk-8-1.png" width="80%" style="display: block; margin: auto;" /&gt;
+&lt;img src="index_files/figure-html/unnamed-chunk-9-1.png" width="80%" style="display: block; margin: auto;" /&gt;
 ]
 .pull-right[
 **Random undersampling:** Take all cases from the minority class in the training set and complement it by drawing random samples with replacement from the majority class.
@@ -296,7 +301,7 @@ comment
 ### 3.1.5 Informed NearMiss Undersampling 
 
 .pull-left[
-&lt;img src="index_files/figure-html/unnamed-chunk-9-1.png" width="80%" style="display: block; margin: auto;" /&gt;
+&lt;img src="index_files/figure-html/unnamed-chunk-10-1.png" width="80%" style="display: block; margin: auto;" /&gt;
 ]
 .pull-right[
 **Informative NearMiss undersampling:** Take only informative samples from the majority class, i.e. samples which are expected to be close to the empirical decision boundary, to improve accuracy in uncertain regions. [[4](#references)]
@@ -331,7 +336,7 @@ comment
 ### 3.2 Case Weighting (*Model Estimation*)
 
 .pull-left[
-&lt;img src="index_files/figure-html/unnamed-chunk-11-1.png" width="80%" style="display: block; margin: auto;" /&gt;
+&lt;img src="index_files/figure-html/unnamed-chunk-12-1.png" width="80%" style="display: block; margin: auto;" /&gt;
 ]
 .pull-right[
 Assign higher *case weights* to samples of the minority class when training the classifier.
@@ -340,7 +345,7 @@ For some model families, this is equivalent to generating duplicate samples with
 ]
 
 .pull-right[.footnote[
-*Note: In some sense this approach is very similar to random oversampling is dicuussed previously.*
+*Note: In some sense this approach is very similar to random oversampling as discussed previously.*
 ]]
 
 ???
@@ -352,7 +357,7 @@ comment
 ### 3.3.1 Confusion Matrix
 
 .pull-left[
-After having successfully trained a classification model, we are generally interested in its out-of-sample performance. Let's again look at the abovementioned **confusion matrix**:
+After having successfully trained a classification model, we are generally interested in its out-of-sample performance. Let's again look at the **confusion matrix** mentioned above:
 ]
 .pull-right[
 
@@ -365,16 +370,16 @@ After having successfully trained a classification model, we are generally inter
 ]
 
 **True Positives (TP)** = 0  
-Correctly predicted positive cases (positive case predicted as positive)
+Correctly predicted positive cases (positive cases predicted as positive)
 
 **False Positives (FP)** = 0  
-Incorrectly predicted negative cases (negative case predicted as positive)
+Incorrectly predicted negative cases (negative cases predicted as positive)
 
 **True Negatives (TN)** = 137  
-Correctly predicted negative cases (negative case predicted as negative)
+Correctly predicted negative cases (negative cases predicted as negative)
 
 **False Negative (FN)** = 9  
-Incorrectly predicted positive cases (positive case predicted as negative)
+Incorrectly predicted positive cases (positive cases predicted as negative)
 
 ???
 comment
@@ -385,7 +390,7 @@ comment
 ### 3.3.1 Confusion Matrix
 
 .pull-left[
-After having successfully trained a classification model, we are generally interested in its out-of-sample performance. Let's look at the following hypothetical confusion matrix:
+After having successfully trained a classification model, we are generally interested in its out-of-sample performance. Let's have a look at the following hypothetical confusion matrix:
 ]
 .pull-right[
 
@@ -422,15 +427,15 @@ shift: in this case lower the threshold to make it more likely to predict a samp
 ### 3.3.2 Receiver Operating Characteristic (ROC)-Curve
 
 .pull-left[
-&lt;img src="index_files/figure-html/unnamed-chunk-14-1.png" width="80%" style="display: block; margin: auto;" /&gt;
+&lt;img src="index_files/figure-html/unnamed-chunk-15-1.png" width="80%" style="display: block; margin: auto;" /&gt;
 ]
 .pull-right[
-**ROC-curve:** Step function that is created by gradually lowering the cutoff (*c*) for classifying a sample into the positive class (from `+inf` to `-inf`). Hence, it is an aggregation of all confusion matrices that result from different values of *c*. [[5](#references)]
+**ROC-curve:** Step function that is created by gradually lowering (from `+inf` to `-inf`) the cutoff (*c*) for classifying a sample as positive. Hence, it aggregates all conceivable confusion matrices. [[5](#references)]
 
 **A:** Our classifier (*Sensitivity* = 0, *Specificity* = 1) which never issues positive predictions (*c* = 0.5).&lt;br&gt;&lt;br&gt;
 **B:** The opposite classifier which only issues positive predictions.&lt;br&gt;&lt;br&gt;
 **C:** The perfect classifier which always predicts the class correctly.&lt;br&gt;&lt;br&gt;
-**D:** A conservative classifier which only issue positive predictions with sufficient evidence (hence, producing few TP and FP).
+**D:** A conservative classifier which only issues positive predictions with sufficient evidence (hence, producing few TP and FP).
 ]
 
 ???
@@ -444,15 +449,14 @@ each point on the ROC-curve corresponds to a single confusion matrix.
 ### 3.3.2 Receiver Operating Characteristic (ROC)-Curve
 
 .pull-left[
-&lt;img src="index_files/figure-html/unnamed-chunk-15-1.png" width="80%" style="display: block; margin: auto;" /&gt;
+&lt;img src="index_files/figure-html/unnamed-chunk-16-1.png" width="80%" style="display: block; margin: auto;" /&gt;
 ]
 .pull-right[
-
-**E:** A liberal classifier which issue positive predictions more liberally (hence, producing many TP but also FP).&lt;br&gt;&lt;br&gt;
+**E:** A liberal classifier which issues positive predictions more liberally (hence, producing many TP but also FP).&lt;br&gt;&lt;br&gt;
 **F:** A random classifier which issues positive predictions according to a coin-toss.&lt;br&gt;&lt;br&gt;
 **G:** Our classifier (*Sensitivity* = 1, *Specificity* = 0.7622) with a shifted classification cutoff (*c* = 0.0249).
 
-**Lower right triangle:** A classifier that performs worse than random. Technically, such a classifier does not existent as you could simply invert the predictions to receive a better-than-random classifier (e.g., FP become TN).
+**Lower right triangle:** A classifier that performs worse than random. Technically, such a classifier does not exist as you could simply invert the predictions to receive a better-than-random classifier (e.g., FP become TN).
 ]
 
 ???
@@ -464,7 +468,7 @@ random classifier: to move form F towards the top-right corner, the classifier m
 ### 3.3.2 Receiver Operating Characteristic (ROC)-Curve
 
 .pull-left[
-&lt;img src="index_files/figure-html/unnamed-chunk-16-1.png" width="80%" style="display: block; margin: auto;" /&gt;
+&lt;img src="index_files/figure-html/unnamed-chunk-17-1.png" width="80%" style="display: block; margin: auto;" /&gt;
 ]
 .pull-right[
 **Properties of the cutoff *c*:** In general, the variation of the cutoff does not need to adhere to predicted probabilities! Any uncalibrated score that allows to rank predictions is sufficient.
@@ -473,7 +477,7 @@ random classifier: to move form F towards the top-right corner, the classifier m
 - This approach does not alter the classifier!
 - It does simply move samples up and down in the confusion matrix.
 
-🤔 **What if we compare different classifier with intersecting ROC-curves?**
+🤔 **What if we compare different classifiers with intersecting ROC-curves?**
 ]
 
 ???
@@ -485,7 +489,7 @@ comment
 ### 3.3.3 Area under the ROC-Curve (ROC-AUC)
 
 .pull-left[
-&lt;img src="index_files/figure-html/unnamed-chunk-17-1.png" width="80%" style="display: block; margin: auto;" /&gt;
+&lt;img src="index_files/figure-html/unnamed-chunk-18-1.png" width="80%" style="display: block; margin: auto;" /&gt;
 ]
 .pull-right[
 **ROC-AUC:** Summary of the area under the ROC-curve (i.e. the integral) that allows to identify the overall best classifier independent of the cutoff *c*.
@@ -522,9 +526,9 @@ comment
 
 ## 4 Cost-Sensitive Learning
 
-A related (partly overlapping) learning paradigm to imbalanced learning is the notion of **cost-sensitive learning**. In contrast to the previous techniques which mainly focus at rebalancing class distributions, cost-sensitive learning explicitly incorporates  cost information when building machine learning systems. [[7](#references)]
+A related (partly overlapping) learning paradigm to imbalanced learning is the notion of **cost-sensitive learning**. In contrast to the previous techniques, which mainly focus on rebalancing class distributions, cost-sensitive learning explicitly incorporates cost information when building machine learning systems. [[7](#references)]
 
-**Relative misclassification cost:** Different misclassifciation errors incur different cost, i.e. misclassifying minority class samples (FN) is usually relatively more costly than misclassifying majority class samples (FP).
+**Relative misclassification cost:** Different misclassification errors incur different cost, i.e. misclassifying minority class samples (FN) is usually relatively more costly than misclassifying majority class samples (FP).
 
 .pull-left[
 **Approaches to cost-sensitive learning:**

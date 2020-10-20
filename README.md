@@ -1,5 +1,5 @@
 # Imbalanced Learning
-*The workshop is part of "Machine Learning in R" graduate course held at University of Münster, School of Business and Economics in the winter term 2020/21.*
+*This workshop is part of the "Machine Learning in R" graduate course held at University of Münster, School of Business and Economics (winter term 2020/21).* :mortar_board:
 
 **Time:** Mo, 2020-11-23  
 **Location:** Zoom  
