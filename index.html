@@ -15,7 +15,7 @@ class: left, middle, inverse, title-slide
 ## Imbalanced Learning
 ### Simon Schölzel
 ### <em>Research Team Berens</em>
-### 2020-08-20 (updated: 2020-10-20)
+### 2020-08-20 (updated: 2020-10-25)
 
 ---
 
@@ -142,22 +142,22 @@ Example:
 
 **.yellow[Data Pipeline]:**
 
-&gt;**1 &amp;nbsp;Data ingestion**  
-**2 Data exploration (EDA)**  
-**3 Data wrangling**  
-**4 Data splitting / resampling**
+&gt;1 Data ingestion  
+2 Data exploration (EDA)  
+3 Data wrangling  
+4 Data splitting / resampling
 
 **.red[ML Pipeline]:**
 
-&gt;**5 Model training**  
-**6 Model evaluation / testing**  
-**7 Model packaging**
+&gt;5 Model training  
+6 Model evaluation / testing  
+7 Model packaging
 
 **.blue[Software &amp; Code Pipeline]:**
 
-&gt;**8 Model deployment**  
-**9 Model performance monitoring**  
-**10 Model performance logging**
+&gt;8 Model deployment  
+9 Model performance monitoring  
+10 Model performance logging
 
 .pull-right[Source: [ml-ops.org](https://ml-ops.org/content/end-to-end-ml-workflow)]
 
@@ -185,6 +185,7 @@ Example:
 - you feed the model into a production environment so that it becomes part of your daily operations (usabale by the end-user)
 9
 - continuous supervision of the model performance based on unseen data (look for indications that re-training is required in case of data drift)
+- **Data Drift:** the test data distribution changes -&gt; model performance degrades without adjustments! -&gt; use new data to retrain the model
 10
 - logging of queries and results in a logfile to be usable for re-training
 
@@ -430,12 +431,11 @@ shift: in this case lower the threshold to make it more likely to predict a samp
 &lt;img src="index_files/figure-html/unnamed-chunk-15-1.png" width="80%" style="display: block; margin: auto;" /&gt;
 ]
 .pull-right[
-**ROC-curve:** Step function that is created by gradually lowering (from `+inf` to `-inf`) the cutoff (*c*) for classifying a sample as positive. Hence, it aggregates all conceivable confusion matrices. [[5](#references)]
+**ROC-curve:** Step function that is created by gradually lowering (from `+inf` to `-inf`) the cutoff (*c*) for classifying a sample as positive. Hence, it aggregates all conceivable confusion matrices and creates a performance profile of the classifier. [[5](#references)]
 
 **A:** Our classifier (*Sensitivity* = 0, *Specificity* = 1) which never issues positive predictions (*c* = 0.5).&lt;br&gt;&lt;br&gt;
 **B:** The opposite classifier which only issues positive predictions.&lt;br&gt;&lt;br&gt;
-**C:** The perfect classifier which always predicts the class correctly.&lt;br&gt;&lt;br&gt;
-**D:** A conservative classifier which only issues positive predictions with sufficient evidence (hence, producing few TP and FP).
+**C:** The perfect classifier which always predicts the class correctly.
 ]
 
 ???
@@ -452,11 +452,12 @@ each point on the ROC-curve corresponds to a single confusion matrix.
 &lt;img src="index_files/figure-html/unnamed-chunk-16-1.png" width="80%" style="display: block; margin: auto;" /&gt;
 ]
 .pull-right[
+**D:** A conservative classifier which only issues positive predictions with sufficient evidence (hence, producing few TP and FP).&lt;br&gt;&lt;br&gt;
 **E:** A liberal classifier which issues positive predictions more liberally (hence, producing many TP but also FP).&lt;br&gt;&lt;br&gt;
 **F:** A random classifier which issues positive predictions according to a coin-toss.&lt;br&gt;&lt;br&gt;
 **G:** Our classifier (*Sensitivity* = 1, *Specificity* = 0.7622) with a shifted classification cutoff (*c* = 0.0249).
 
-**Lower right triangle:** A classifier that performs worse than random. Technically, such a classifier does not exist as you could simply invert the predictions to receive a better-than-random classifier (e.g., FP become TN).
+**Lower right triangle:** A classifier that performs worse than random. Technically, such a classifier does not exist as you could simply invert the predictions (e.g., FP become TN).
 ]
 
 ???

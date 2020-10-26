@@ -201,22 +201,22 @@ knitr::include_graphics("https://ml-ops.org/img/ml-engineering.jpg")
 
 **.yellow[Data Pipeline]:**
 
->**1 &nbsp;Data ingestion**  
-**2 Data exploration (EDA)**  
-**3 Data wrangling**  
-**4 Data splitting / resampling**
+>1 Data ingestion  
+2 Data exploration (EDA)  
+3 Data wrangling  
+4 Data splitting / resampling
 
 **.red[ML Pipeline]:**
 
->**5 Model training**  
-**6 Model evaluation / testing**  
-**7 Model packaging**
+>5 Model training  
+6 Model evaluation / testing  
+7 Model packaging
 
 **.blue[Software & Code Pipeline]:**
 
->**8 Model deployment**  
-**9 Model performance monitoring**  
-**10 Model performance logging**
+>8 Model deployment  
+9 Model performance monitoring  
+10 Model performance logging
 
 .pull-right[Source: [ml-ops.org](https://ml-ops.org/content/end-to-end-ml-workflow)]
 
@@ -244,6 +244,7 @@ knitr::include_graphics("https://ml-ops.org/img/ml-engineering.jpg")
 - you feed the model into a production environment so that it becomes part of your daily operations (usabale by the end-user)
 9
 - continuous supervision of the model performance based on unseen data (look for indications that re-training is required in case of data drift)
+- **Data Drift:** the test data distribution changes -> model performance degrades without adjustments! -> use new data to retrain the model
 10
 - logging of queries and results in a logfile to be usable for re-training
 
@@ -657,12 +658,11 @@ p
 ```
 ]
 .pull-right[
-**ROC-curve:** Step function that is created by gradually lowering (from `+inf` to `-inf`) the cutoff (*c*) for classifying a sample as positive. Hence, it aggregates all conceivable confusion matrices. [[5](#references)]
+**ROC-curve:** Step function that is created by gradually lowering (from `+inf` to `-inf`) the cutoff (*c*) for classifying a sample as positive. Hence, it aggregates all conceivable confusion matrices and creates a performance profile of the classifier. [[5](#references)]
 
 **A:** Our classifier (*Sensitivity* = 0, *Specificity* = 1) which never issues positive predictions (*c* = 0.5).<br><br>
 **B:** The opposite classifier which only issues positive predictions.<br><br>
-**C:** The perfect classifier which always predicts the class correctly.<br><br>
-**D:** A conservative classifier which only issues positive predictions with sufficient evidence (hence, producing few TP and FP).
+**C:** The perfect classifier which always predicts the class correctly.
 ]
 
 ???
@@ -681,11 +681,12 @@ p
 ```
 ]
 .pull-right[
+**D:** A conservative classifier which only issues positive predictions with sufficient evidence (hence, producing few TP and FP).<br><br>
 **E:** A liberal classifier which issues positive predictions more liberally (hence, producing many TP but also FP).<br><br>
 **F:** A random classifier which issues positive predictions according to a coin-toss.<br><br>
 **G:** Our classifier (*Sensitivity* = 1, *Specificity* = 0.7622) with a shifted classification cutoff (*c* = 0.0249).
 
-**Lower right triangle:** A classifier that performs worse than random. Technically, such a classifier does not exist as you could simply invert the predictions to receive a better-than-random classifier (e.g., FP become TN).
+**Lower right triangle:** A classifier that performs worse than random. Technically, such a classifier does not exist as you could simply invert the predictions (e.g., FP become TN).
 ]
 
 ???
