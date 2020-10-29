@@ -1,7 +1,7 @@
 # Imbalanced Learning
 *This workshop is part of the "Machine Learning in R" graduate course held at University of Münster, School of Business and Economics (winter term 2020/21).* :mortar_board:
 
-**Time:** Mo, 2020-11-23  
+**Time:** Monday, 2020-11-23, 16.00-18.00  
 **Location:** Zoom  
 **Presenter:** Simon Schölzel, M.Sc.  
 **Slides:** https://simonschoe.github.io/imbalanced-learning/
