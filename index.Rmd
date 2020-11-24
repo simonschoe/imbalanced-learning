@@ -104,7 +104,7 @@ As can be inferred from this quote, the presence of class imbalance depends on t
 The relation between the number of samples in the majority vs. minority class is called the **class distribution** and it is often expressed in terms of ratios (e.g., 100:1) or percentages (e.g., 4% vs. 96%).
 <br><br><br>
 ```{r, echo=F, out.height='50%', out.width='50%', fig.align='left'}
-knitr::include_graphics("img/class-imb.PNG")
+knitr::include_graphics("img/class-imb.png")
 ```
 
 .pull-right[.footnote[
