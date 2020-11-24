@@ -3,7 +3,7 @@ title: "Machine Learning in R:<br/>Workshop Series"
 subtitle: "Imbalanced Learning"
 author: "Simon Schölzel"
 institute: "*Research Team Berens*"
-date: "2020-08-20 (updated: `r Sys.Date()`)"
+date: "2020-11-24 (updated: `r Sys.Date()`)"
 
 output:
   xaringan::moon_reader:
@@ -75,10 +75,6 @@ name: agenda
 
 **4 Cost-Sensitive Learning**
 
-
-???
-comment
-
 ---
 
 ## 1 Learning Objectives `r emo::ji("idea")`
@@ -91,18 +87,19 @@ More specifically, after this workshop you will
 - have internalized basic (random under- and oversampling) and more advanced techniques of resampling (SMOTE, Borderline SMOTE, NearMiss),<br><br>
 - know how to distinguish alternative routes to handling class imbalance, such as imbalanced learning or cost-sensitive learning.
 
-???
-comments
-
 ---
 
 ## 2 Introduction to Imbalanced Learning
 
 > An imbalance occurs when one or more classes have very low proportions in the training data as compared to the other classes. ~ [Kuhn, M./Johnson, K. (2019), p. 419](#references)
 
+--
+
 As can be inferred from this quote, the presence of class imbalance depends on the properties of your data set. It is a definition based on relations between two types of classes:
 - **Majority class:** The class (or set of classes) which accounts for the vast majority of the samples.
 - **Minority class:** The underrepresented class which is characterized by relatively few samples.
+
+--
 
 The relation between the number of samples in the majority vs. minority class is called the **class distribution** and it is often expressed in terms of ratios (e.g., 100:1) or percentages (e.g., 4% vs. 96%).
 <br><br><br>
@@ -113,12 +110,12 @@ knitr::include_graphics("img/class-imb.PNG")
 .pull-right[.footnote[
 *Note: In this workshop we focus on class imbalance in the context of classification. Most of the ideas, however, analogously transfer to the realm of regression problems where outliers reflect the minority class.*
 
-*Source: "Make your own sample cartoons!" by [Allison Horst](https://github.com/allisonhorst/stats-illustrations).*
+*Source: [Allison Horst](https://github.com/allisonhorst/stats-illustrations).*
 ]]
 
 ???
-class distribution for imbalanced data sets: skewed
-In most practical applications, such as fraud detection, churn prediction or bankruptcy prediction, you are particularly interested in correctly predicting the *minority class*.
+- class distribution for imbalanced data sets: skewed
+- In most practical applications, such as fraud detection, churn prediction or bankruptcy prediction, you are particularly interested in correctly predicting the *minority class*.
 
 ---
 
@@ -139,12 +136,17 @@ predictions <- glm(response ~ bill_length_mm + bill_length_mm, data = model_df, 
 
 conf_mat <- model_df %>% 
   add_column(predictions) %>% 
-  mutate(across(predictions, ~if_else(. > .5, 1, 0) %>% factor(., levels = c(0, 1)))) %>% 
+  mutate(across(predictions, ~ { if_else(. > .5, 1, 0) %>% factor(., levels = c(0, 1)) } )) %>% 
   conf_mat(truth = response, estimate = predictions)
 ```
 
 .pull-left[
-```{r, echo=F, out.width='100%', fig.retina=3, fig.align='center'}
+**Implication of imbalanced learning regimes:** There is only very few information in the minority class for a model to learn from. This may lead to
+- an overemphasis of the majority class,
+- poorly calibrated prediction models,
+- a focus on detrimental model candidates.
+
+```{r, echo=F, fig.width=8, fig.asp=0.618, fig.retina=3, fig.align='center'}
 model_df %>% 
   ggplot(aes(x = bill_length_mm, y = bill_depth_mm)) +
     geom_point(aes(color = response), size = 2) +
@@ -166,17 +168,15 @@ model_df %>%
     )
 ```
 ]
-.pull-right[
-**Implication of imbalanced learning regimes:** There is only very few information in the minority class for a model to learn from. This may lead to
-- an overemphasis of the majority class,
-- poorly calibrated prediction models,
-- a focus on detrimental model candidates.
 
+--
+
+.pull-right[
 Let's consider the following confusion matrix which belongs to a classification model that was trained on the penguin data:
 ```{r, echo=F, fig.align='center'}
 conf_mat
 ```
-A naive classifier which always predicts the negative class will be correct `r round((1 - 9 / 137) * 100, 1)`% of the time. `r emo::ji('astonished')`
+A *naive classifier which always predicts the negative class will be correct `r round((1 - 9 / 137) * 100, 1)`% of the time. `r emo::ji('astonished')`
 ]
 
 ???
@@ -199,54 +199,33 @@ Example:
 knitr::include_graphics("https://ml-ops.org/img/ml-engineering.jpg")
 ```
 
-**.yellow[Data Pipeline]:**
+**.yellow[Data Pipeline]**
 
 >1 Data ingestion  
 2 Data exploration (EDA)  
 3 Data wrangling  
-4 Data splitting / resampling
+4 Data partitioning / resampling
 
-**.red[ML Pipeline]:**
+**.red[ML Pipeline]**
 
 >5 Model training  
 6 Model evaluation / testing  
 7 Model packaging
 
-**.blue[Software & Code Pipeline]:**
+**.blue[Software & Code Pipeline]**
 
 >8 Model deployment  
 9 Model performance monitoring  
 10 Model performance logging
 
-.pull-right[Source: [ml-ops.org](https://ml-ops.org/content/end-to-end-ml-workflow)]
+.footnote[*Source: [ml-ops.org](https://ml-ops.org/content/end-to-end-ml-workflow)*]
 
 ???
-1
-- data acquisition: collect data
-- data generation: even generate synthetic data
-- data selection: select relevant data sources
-- data integration: integrate selected data sources
-2
-- data profiling: categorize content and structure, i.e. generate metadata (data type, min, max, average)
-- data validation: learn about data errors
-3
-- clean and transform data (usually most time-consuming step -> also most critical due to gigo-principle), e.g., missing value and outliers handling
-4
-- data split into training, validation, and test datasets
-5
-- feature engineering
-- model estimation
-- hyperparameter tuning
-6 
-7
-- exporting the model to be implementable in a business context (i.e. as part of desktop or mobile application)
-8
-- you feed the model into a production environment so that it becomes part of your daily operations (usabale by the end-user)
-9
-- continuous supervision of the model performance based on unseen data (look for indications that re-training is required in case of data drift)
-- **Data Drift:** the test data distribution changes -> model performance degrades without adjustments! -> use new data to retrain the model
-10
-- logging of queries and results in a logfile to be usable for re-training
+different steps within our pipeline where we can address class imbalance:
+- data collection
+- resampling
+- model training / estimation
+- model evaluation
 
 ---
 
@@ -255,19 +234,20 @@ knitr::include_graphics("https://ml-ops.org/img/ml-engineering.jpg")
 
 The upcoming techniques address the issue of class imbalance by implementing sampling strategies that prevent imbalances, either a priori (prior to *data collection*) or post hoc (after *data collection*).
 
+--
+
 **A priori:** Collect data in a way that directly ensures a uniform class distribution.
 
-**Post hoc:** Set up your resampling approach (e.g., train-test-split, cross-validation) in a way that ensures a uniform class distribution.
+--
+
+**Post hoc:** Set up your resampling approach (e.g., cross-validation, bootstrapping) in a way that ensures a uniform class distribution.
 - Oversampling (also: upsampling)
 - Undersampling (also: downsampling)
 - Hybrid approaches (mixture of over- and undersampling)
 
 .footnote[
-*Note: The sampling strategies are model-agnostic as class imbalance is addressed on the data level. Eventually, model performance must be assessed on an imbalanced test set to receive a realistic estimate of the model's performance.*
+*Note: The resampling strategies are model-agnostic as class imbalance is addressed on the data level. Eventually, model performance must be assessed on an imbalanced test set to receive a realistic estimate of the model's performance.*
 ]
-
-???
-comment
 
 ---
 
@@ -275,7 +255,7 @@ comment
 ### 3.1.1 Random Oversampling
 
 .pull-left[
-```{r, echo=F, out.width='80%', fig.retina=3, fig.align='center', warning=F}
+```{r, echo=F, fig.width=8, fig.asp=0.618, fig.retina=3, fig.align='center', warning=F}
 model_df %>% 
   recipe(response ~ bill_length_mm + bill_depth_mm, data = .) %>%
   step_upsample(response, over_ratio = 1, seed = 2020) %>%
@@ -303,17 +283,14 @@ model_df %>%
 ]
 .pull-right[
 **Random oversampling:** Take all cases from the majority class in the training set and complement it by drawing random samples with replacement from the minority class.
-- The training set size is determined by the size of the majority class (for a 1:1 ratio).
+- The training set size is determined by the size of the majority class.
 - The classifier may extract information from one sample several times.
 - Duplication of potentially uninformative samples and risk of overfitting.
 ]
 
-.footnote[.pull-right[
-Note: This plot uses `geom_jitter()` from the `ggplot2` package. Thus, the generated samples are slightly shifted. In reality, they have the exact same values as the three original positive samples. 
-]]
-
-???
-comment
+.footnote[
+*Note: This plot uses `geom_jitter()` from the `ggplot2` package. Thus, the generated samples are slightly shifted. In reality, they have the exact same values as the three original positive samples.*
+]
 
 ---
 
@@ -321,7 +298,7 @@ comment
 ### 3.1.2 Synthetic Minority Over-Sampling Technique (SMOTE)
 
 .pull-left[
-```{r, echo=F, out.width='80%', fig.retina=3, fig.align='center', warning=F}
+```{r, echo=F, fig.width=8, fig.asp=0.618, fig.retina=3, fig.align='center', warning=F}
 model_df %>% 
   recipe(response ~ bill_length_mm + bill_depth_mm, data = .) %>%
   step_smote(response, over_ratio = 1, neighbors = 3, seed = 2020) %>%
@@ -349,20 +326,21 @@ model_df %>%
 ```
 ]
 .pull-right[
-**SMOTE:** Take the minority class and generate additional synthetic samples by using *k-NN*. [[2](#references)]
+**SMOTE:** Take the minority class and generate additional synthetic samples by using *k*-NN. [[2](#references)]
 - The classifier can leverage new samples which are similar but not equal to the original ones.
 - SMOTE enriches the minority class feature space by filling it (instead of extending it).
 
 **Algorithm:**
-1. Randomly select original sample (△) from the minority class and its *k* NN.
-2. Create synthetic sample (○) randomly along the vector between the sample and each NN.
-3. Repeat till desired class distribution is established.
+1. Randomly select a minority class sample s well as its *k* nearest neighbors.
+2. Randomly create a synthetic sample along the vector between the minority class sample and each nearest neighbor.
+3. Repeat till desired class distribution is reached.
 ]
 
 
 ???
-k-NN: k neareast neighbor algorithm where k is the number of nearest neighbors considered.
-Step 2: i have 4 samples, i.e. 3 nearest neighbours. create 3 synthetic samples and then again select new sample randomly.
+- k-NN: k neareast neighbor algorithm where k is the number of nearest neighbors considered.
+- step 1: nearest neighbors are also from the minority class
+- Step 2: i have 4 samples, i.e. 3 nearest neighbours. create 3 synthetic samples and then again select new sample randomly.
 
 ---
 
@@ -370,7 +348,7 @@ Step 2: i have 4 samples, i.e. 3 nearest neighbours. create 3 synthetic samples 
 ### 3.1.3 Borderline SMOTE
 
 .pull-left[
-```{r, echo=F, out.width='80%', fig.retina=3, fig.align='center', warning=F}
+```{r, echo=F, fig.width=8, fig.asp=0.618, fig.retina=3, fig.align='center', warning=F}
 model_df %>% 
   recipe(response ~ bill_length_mm + bill_depth_mm, data = .) %>%
   step_bsmote(response, all_neighbors = FALSE, over_ratio = 1, neighbors = 2, seed = 2020) %>%
@@ -398,14 +376,14 @@ model_df %>%
 ```
 ]
 .pull-right[
-**Three types of samples:**
-- *Safe* (all NN of minority class)
-- *Lost* (all NN of majority class)
-- *Borderline* (> 50% NN of majority class)
+**Three types of minority class samples:**
+- *Safe* (all nearest neighbors of minority class)
+- *Lost* (all nearest neighbors of majority class)
+- *Borderline* (> 50% neighbors of majority class)
 
-**Borderline SMOTE:** Take the *borderline samples* in the minority class and generate additional synthetic samples by using *k-NN* to improve accuracy in uncertain regions. [[3](#references)]
-- **Borderline SMOTE1:** Create synthetic samples only from minority class NN (i.e. filling the minority class feature space).
-- **Borderline SMOTE2:** Create synthetic samples from all NN (i.e. extending the minority class feature space).
+**Borderline SMOTE:** Take the *borderline samples* in the minority class and generate additional synthetic samples by using *k*-NN to improve model accuracy in uncertain regions. [[3](#references)]
+- **Borderline SMOTE1:** Create synthetic samples only from minority class nearest neighbors (i.e. filling the minority class feature space).
+- **Borderline SMOTE2:** Create synthetic samples from all nearest neighbors (i.e. extending the minority class feature space).
 ]
 
 ???
@@ -417,7 +395,7 @@ Borderline SMOTE focuses on uncertain samples (safe and lost samples are certain
 ### 3.1.4 Random Undersampling
 
 .pull-left[
-```{r, echo=F, out.width='80%', fig.retina=3, fig.align='center', warning=F}
+```{r, echo=F, fig.width=8, fig.asp=0.618, fig.retina=3, fig.align='center', warning=F}
 model_df %>% 
   recipe(response ~ bill_length_mm + bill_depth_mm, data = .) %>%
   step_downsample(response, under_ratio = 1, seed = 2020) %>%
@@ -450,16 +428,13 @@ model_df %>%
 - Deletion of potentially informative samples.
 ]
 
-???
-comment
-
 ---
 
 ## 3.1 Sampling Strategies (*Resampling*)
 ### 3.1.5 Informed NearMiss Undersampling 
 
 .pull-left[
-```{r, echo=F, out.width='80%', fig.retina=3, fig.align='center', warning=F}
+```{r, echo=F, fig.width=8, fig.asp=0.618, fig.retina=3, fig.align='center', warning=F}
 model_df %>% 
   recipe(response ~ bill_length_mm + bill_depth_mm, data = .) %>%
   step_nearmiss(response, under_ratio = 1, neighbors = 5, seed = 2020) %>%
@@ -506,13 +481,16 @@ knitr::include_graphics("https://camo.githubusercontent.com/4da51d5ade52abe55b21
 
 **Additional remarks:**
 - The effectiveness of the different sampling techniques depends heavily on the underlying data as well as the applied model.<br><br>
-- In practice, it is often sufficient to eliminate severe imbalance and keep a slight imbalance (e.g., 60:40), i.e. a 1:1 ratio as advocated here is not required.<br><br>
-- You may consider the ratio (as well as the number of NN) as potential hyperparameter in your modeling workflow.<br><br>
+- In practice, it is often sufficient to eliminate severe imbalance and keep a slight imbalance (e.g., 60:40), i.e. a 1:1 ratio as advocated here is not always required.<br><br>
+- You may consider the ratio (as well as the number of nearest neighbors) as potential hyperparameters in your modeling workflow.<br><br>
 - Even though the examples center around a 2-dimensional feature space, the techniques easily generalize to higher dimensional feature spaces.<br><br>
-- The `themis` package is a good place to look when facing class imbalance in your modeling pipeline. 
+- The `themis` package is a good place to start when facing class imbalance in your modeling pipeline. 
+---
 
-???
-comment
+layout: false
+class: center, middle
+
+# 5-Minute Break<br><br>`r emo::ji("coffee")` `r emo::ji("doughnut")`
 
 ---
 
@@ -520,7 +498,7 @@ comment
 ### 3.2 Case Weighting (*Model Estimation*)
 
 .pull-left[
-```{r, echo=F, out.width='80%', fig.retina=3, fig.align='center', warning=F}
+```{r, echo=F, fig.width=8, fig.asp=0.618, fig.retina=3, fig.align='center', warning=F}
 model_df %>% 
   ggplot(aes(x = bill_length_mm, y = bill_depth_mm)) +
     geom_point(aes(color = response, size = response)) +
@@ -548,12 +526,9 @@ Assign higher *case weights* to samples of the minority class when training the 
 For some model families, this is equivalent to generating duplicate samples with identical feature values.
 ]
 
-.pull-right[.footnote[
+.footnote[
 *Note: In some sense this approach is very similar to random oversampling as discussed previously.*
-]]
-
-???
-comment
+]
 
 ---
 
@@ -569,20 +544,19 @@ conf_mat
 ```
 ]
 
-**True Positives (TP)** = 0  
+--
+
+**True Positives:** $TP=$ 0  
 Correctly predicted positive cases (positive cases predicted as positive)
 
-**False Positives (FP)** = 0  
+**False Positives:** $FP=$ 0   
 Incorrectly predicted negative cases (negative cases predicted as positive)
 
-**True Negatives (TN)** = 137  
+**True Negatives:** $TN=$ 137  
 Correctly predicted negative cases (negative cases predicted as negative)
 
-**False Negative (FN)** = 9  
+**False Negatives:** $FN=$ 9  
 Incorrectly predicted positive cases (positive cases predicted as negative)
-
-???
-comment
 
 ---
 
@@ -590,7 +564,7 @@ comment
 ### 3.3.1 Confusion Matrix
 
 .pull-left[
-After having successfully trained a classification model, we are generally interested in its out-of-sample performance. Let's have a look at the following hypothetical confusion matrix:
+After having successfully trained a classification model, we are generally interested in its out-of-sample performance. Let's again look at the **confusion matrix** mentioned above:
 ]
 .pull-right[
 ```{r, echo=F}
@@ -598,24 +572,24 @@ conf_mat
 ```
 ]
 
---
-
-**Sensitivity** = TP / (TP + FN) = 0 / (0 + 9) = `r 0 / 9`  
+**Sensitivity:** $sens=TP/(TP+FN)=$ 0 / (0 + 9) = 0  
 The proportion of positives that are correctly classified (also called *True Positive Rate (TPR)* or *Recall*)
 
-**Specificity** = TN / (FP + TN) = 137 / (0 + 137) = `r 137 / 137`   
+**Specificity:** $spec=TN/(FP+TN)=$ 137 / (0 + 137) = 1   
 The proportion of negatives that are correctly classified
 
 --
 
-`r emo::ji("bangbang")` This discrepancy between *sensitivity* and *specificity* highlights the trade-off inherent to the two metrics: Optimizing for the correct prediction of the positive (negative) class results in a higher chance of FP (FN). Hence, it is merely a trade-off between the two types of classification error.
+This discrepancy between *sensitivity* and *specificity* highlights the trade-off inherent to the two metrics: Optimizing for the correct prediction of the positive (negative) class results in a higher chance of FP (FN). Hence, it is merely a trade-off between the two types of classification error.
 
 --
 
 `r emo::ji("thinking")` **What if we simply shift the cutoff (e.g., 0.5) for classifying a sample into the positive class?**
 
 ???
-shift: in this case lower the threshold to make it more likely to predict a sample as positive. here the underlying model is a logistic regression which gives us predicted probabilities. other classifiers may give us other outputs that help us to discriminate between classes
+- shift: in this case lower the threshold to make it more likely to predict a sample as positive.
+- here the underlying model is a logistic regression which gives us predicted probabilities.
+- other classifiers (e.g., SVM) may give us other outputs that help us to discriminate between classes
 
 ---
 
@@ -623,7 +597,7 @@ shift: in this case lower the threshold to make it more likely to predict a samp
 ### 3.3.2 Receiver Operating Characteristic (ROC)-Curve
 
 .pull-left[
-```{r, echo=F, out.width='80%', fig.retina=3, fig.align='center'}
+```{r, echo=F, fig.width=8, fig.asp=0.618, fig.retina=3, fig.align='center'}
 points <- tibble(
   one_minus_spec = c(0, 1, 0, .05, .5, .5, (1-0.78102190)),
   sens = c(0, 1, 1, .5, .95, .5, 0.7777778),
@@ -658,17 +632,17 @@ p
 ```
 ]
 .pull-right[
-**ROC-curve:** Step function that is created by gradually lowering (from `+inf` to `-inf`) the cutoff (*c*) for classifying a sample as positive. Hence, it aggregates all conceivable confusion matrices and creates a performance profile of the classifier. [[5](#references)]
+**ROC-curve:** Step function created by gradually lowering (from `+inf` to `-inf`) the cutoff ( $c$ ) for classifying a sample as positive. It aggregates all possible confusion matrices and creates a performance profile of the classifier. [[5](#references)]
 
-**A:** Our classifier (*Sensitivity* = 0, *Specificity* = 1) which never issues positive predictions (*c* = 0.5).<br><br>
+**A:** Our classifier ( $sens=$ 0, $spec=$ 1) which never issues positive predictions ( $c=$ 0.5 ).<br><br>
 **B:** The opposite classifier which only issues positive predictions.<br><br>
 **C:** The perfect classifier which always predicts the class correctly.
 ]
 
 ???
-The Roc-curve is robust to class imbalance as we only have ratio on the axes, therefore, it also much more reliable than plain vanilla accuracy.
-ROC-curve can be created for any classifier that outputs some kind of ranking
-each point on the ROC-curve corresponds to a single confusion matrix.
+- ROC-curve can be created for any classifier that outputs some kind of ranking
+- each point on the ROC-curve corresponds to a single confusion matrix.
+- more nuanced view than plain vanilla accuracy
 
 ---
 
@@ -676,7 +650,7 @@ each point on the ROC-curve corresponds to a single confusion matrix.
 ### 3.3.2 Receiver Operating Characteristic (ROC)-Curve
 
 .pull-left[
-```{r, echo=F, out.width='80%', fig.retina=3, fig.align='center'}
+```{r, echo=F, fig.width=8, fig.asp=0.618, fig.retina=3, fig.align='center'}
 p
 ```
 ]
@@ -684,13 +658,13 @@ p
 **D:** A conservative classifier which only issues positive predictions with sufficient evidence (hence, producing few TP and FP).<br><br>
 **E:** A liberal classifier which issues positive predictions more liberally (hence, producing many TP but also FP).<br><br>
 **F:** A random classifier which issues positive predictions according to a coin-toss.<br><br>
-**G:** Our classifier (*Sensitivity* = 1, *Specificity* = 0.7622) with a shifted classification cutoff (*c* = 0.0249).
-
-**Lower right triangle:** A classifier that performs worse than random. Technically, such a classifier does not exist as you could simply invert the predictions (e.g., FP become TN).
+**G:** Our classifier ( $sens=$ 1, $spec=$ 0.7622) with a shifted classification cutoff ( $c=$ 0.0249 ).<br><br>
+**Lower right triangle:** A classifier that performs worse than random.
 ]
 
 ???
-random classifier: to move form F towards the top-right corner, the classifier must exploit some of the information hidden in the data
+- random classifier: to move form F towards the top-right corner, the classifier must exploit some of the information hidden in the data
+- worse than random classifier: Technically, such a classifier does not exist as you could simply invert the predictions (e.g., FP become TN).
 
 ---
 
@@ -698,12 +672,12 @@ random classifier: to move form F towards the top-right corner, the classifier m
 ### 3.3.2 Receiver Operating Characteristic (ROC)-Curve
 
 .pull-left[
-```{r, echo=F, out.width='80%', fig.retina=3, fig.align='center'}
+```{r, echo=F, fig.width=8, fig.asp=0.618, fig.retina=3, fig.align='center'}
 p
 ```
 ]
 .pull-right[
-**Properties of the cutoff *c*:** In general, the variation of the cutoff does not need to adhere to predicted probabilities! Any uncalibrated score that allows to rank predictions is sufficient.
+**Properties of the cutoff $c$ :** In general, the variation of the cutoff does not need to adhere to predicted probabilities! Any uncalibrated score that allows to rank predictions is sufficient.
 
 **Optimal strategy:** Choose the cutoff so that the classifier is closest to the top-left corner of the ROC-plot.
 - This approach does not alter the classifier!
@@ -712,16 +686,13 @@ p
 `r emo::ji("thinking")` **What if we compare different classifiers with intersecting ROC-curves?**
 ]
 
-???
-comment
-
 ---
 
 ## 3.3 Excursus: Evaluation of Classification Models
 ### 3.3.3 Area under the ROC-Curve (ROC-AUC)
 
 .pull-left[
-```{r, echo=F, out.width='80%', fig.retina=3, fig.align='center'}
+```{r, echo=F, fig.width=8, fig.asp=0.618, fig.retina=3, fig.align='center'}
 df_a <- penguins %>% 
   drop_na %>% 
   mutate(response = if_else(species == "Adelie" | species == "Gentoo", 1, 0) %>% as.factor,
@@ -765,35 +736,34 @@ ggplot() +
 ```
 ]
 .pull-right[
-**ROC-AUC:** Summary of the area under the ROC-curve (i.e. the integral) that allows to identify the overall best classifier independent of the cutoff *c*.
-- Lies on the [0;1]-interval (technically, [0.5;1]).
+**ROC-AUC:** Summary of the area under the ROC-curve (i.e. the integral) that allows to identify the overall best classifier independent of the cutoff $c$ .
+- Lies on the $[0;1]$-interval (technically, $[0.5;1]$).
 - Likelihood that the classifier assigns a higher score to a randomly chosen positive relative to a negative sample (*discriminatory power*).
-- **Here:** *AUC(C1)* = `r df_a %>% roc_auc(truth = response, pred, event_level = "first") %>% .$.estimate %>% round(4)` > *AUC(C2)* = `r df_b %>% roc_auc(truth = response, pred, event_level = "second") %>% .$.estimate %>% round(4)`
 
-**Multi-class ROC-AUC:** With *n* > 2 classes the classification problem becomes more complex (*n*x*n* confusion matrix with multiple error types). Hence, alternative approaches are required:
+**Here:** $AUC(C1)=$ `r df_a %>% roc_auc(truth = response, pred, event_level = "first") %>% .$.estimate %>% round(4)` $>$ $AUC(C2)=$ `r df_b %>% roc_auc(truth = response, pred, event_level = "second") %>% .$.estimate %>% round(4)`
+
+**Multi-class ROC-AUC:** With $n>$ 2 classes the problem gets more complex. Hence, alternative approaches are required:
 - One vs. rest ROC-curves
 - Weighted one vs. rest ROC-AUC [[5](#references)] 
 - Generalized ROC-AUC [[6](#references)]
 ]
 
 ???
-is a scalar value
-weighted one vs rest ROC-AUC: (weighted by class prevalence)
-generalized roc-auc builds on pairwise ROC-AUCs
+- ROC-AUC is a scalar value
+- multi-class ROC: confusion matrix of dimension n x n with multiple error types (not only TP, TN, FP and FN)
+- weighted one vs rest ROC-AUC: (weighted by class prevalence)
+- generalized roc-auc builds on pairwise ROC-AUCs
 
 ---
 
 ## 3 Techniques for Addressing Class Imbalance
 ### 3.4 Tinkering with Classification Cutoffs (*Model Evaluation*)
 
-As previously discussed, one approach for tackling class imbalance is to simply trade-off *sensitivity* and *specificity* to strike an optimal balance between the two. Usually, by varying the cutoff *c* the increase in one of the two metrics comes at the disadvantage of the other.
+As previously discussed, one approach for tackling class imbalance is to simply trade-off *sensitivity* and *specificity* to strike an optimal balance between the two. Usually, by varying the cutoff $c$ the increase in one of the two metrics comes at the disadvantage of the other.
 
 **Possible approaches:**
 - Optimize the sensitivity-specificity-relation according to some pre-defined target.
-- Optimize the classification rule by selecting cutoff that produces shortest distance to the optimum.
-
-???
-comment
+- Optimize the classification rule by selecting a cutoff that produces the shortest distance to the optimum in the ROC-plot.
 
 ---
 
@@ -805,14 +775,15 @@ A related (partly overlapping) learning paradigm to imbalanced learning is the n
 
 .pull-left[
 **Approaches to cost-sensitive learning:**
-- Incorporate cost information into your loss function by specifying a *cost matrix*.
+- Incorporate cost information into your loss function by specifying a *cost matrix*.<br><br>
 - Use *robust algorithms* that can account for different misclassification cost, e.g., by assigning higher cost to FN.
 ]
 .pull-right[.center[
 ```{r, echo=F, out.width='100%', out.height='100%'}
 knitr::include_graphics("./img/cost-matrix.PNG")
 ```
-Multiclass cost matrix adapted from [[7](#references)].
+
+*Source: Multi-class cost matrix adapted from [[7](#references)].*
 ]]
 
 ???
@@ -837,8 +808,3 @@ name: references
 [6]: **Hand, D. J./Till, Robert, J. (2001):** A Simple Generalisation of the Area Under the ROC Curve for Multiple Class Classification Problems. Machine Learning, Vol. 45, 2001, No. 2, pp. 171‑186.
 
 [7]: **He, H./Garcia, E. A. (2009):** Learning from Imbalanced Data. In: IEEE Transactions on Knowledge and Data Engineering, Vol. 21, 2009, No. 9, pp. 1263‑1284.
-
-???
-convert online presentation to pdf:
-
-docker run --rm -t -v %cd%/desktop/l09_desktop/workshops/03_feature_engineering/slides:/slides astefanutti/decktape https://simonschoe.github.io/Feature-Engineering/#1 index.pdf
