@@ -331,7 +331,7 @@ model_df %>%
 - SMOTE enriches the minority class feature space by filling it (instead of extending it).
 
 **Algorithm:**
-1. Randomly select a minority class sample s well as its *k* nearest neighbors.
+1. Randomly select a minority class sample as well as its *k* nearest neighbors.
 2. Randomly create a synthetic sample along the vector between the minority class sample and each nearest neighbor.
 3. Repeat till desired class distribution is reached.
 ]
