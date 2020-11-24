@@ -659,7 +659,7 @@ p
 **D:** A conservative classifier which only issues positive predictions with sufficient evidence (hence, producing few TP and FP).<br><br>
 **E:** A liberal classifier which issues positive predictions more liberally (hence, producing many TP but also FP).<br><br>
 **F:** A random classifier which issues positive predictions according to a coin-toss.<br><br>
-**G:** Our classifier ( $sens=$ 0.8889, $spec=$ 0.7007) with an optimized classification cutoff ( $c=$ 0.0699 ).<br><br>
+**G:** Our classifier ( $sens=$ 0.8889, $spec=$ 0.7007) with an optimized cutoff ( $c=$ 0.0699 ).<br><br>
 **Lower right triangle:** A classifier that performs worse than random.
 ]
 
@@ -745,8 +745,6 @@ ggplot() +
 - Likelihood that the classifier assigns a higher score to a randomly chosen positive relative to a negative sample (*discriminatory power*).
 
 **Here:** $AUC(C2)=$ `r df_a %>% roc_auc(truth = response, pred, event_level = "first") %>% .$.estimate %>% round(4)` $>$ $AUC(C1)=$ `r df_b %>% roc_auc(truth = response, pred, event_level = "second") %>% .$.estimate %>% round(4)`
-
---
 
 **Multi-class ROC-AUC:** With $n>$ 2 classes the problem gets more complex. Hence, alternative approaches are required:
 - One vs. rest ROC-curves

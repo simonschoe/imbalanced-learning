@@ -105,7 +105,7 @@ layout: false
 - poorly calibrated prediction models,
 - a focus on detrimental model candidates.
 
-&lt;img src="index_files/figure-html/unnamed-chunk-18-1.png" width="576" style="display: block; margin: auto;" /&gt;
+&lt;img src="index_files/figure-html/unnamed-chunk-3-1.png" width="576" style="display: block; margin: auto;" /&gt;
 ]
 
 --
@@ -196,7 +196,7 @@ The upcoming techniques address the issue of class imbalance by implementing sam
 ### 3.1.1 Random Oversampling
 
 .pull-left[
-&lt;img src="index_files/figure-html/unnamed-chunk-21-1.png" width="576" style="display: block; margin: auto;" /&gt;
+&lt;img src="index_files/figure-html/unnamed-chunk-6-1.png" width="576" style="display: block; margin: auto;" /&gt;
 ]
 .pull-right[
 **Random oversampling:** Take all cases from the majority class in the training set and complement it by drawing random samples with replacement from the minority class.
@@ -215,7 +215,7 @@ The upcoming techniques address the issue of class imbalance by implementing sam
 ### 3.1.2 Synthetic Minority Over-Sampling Technique (SMOTE)
 
 .pull-left[
-&lt;img src="index_files/figure-html/unnamed-chunk-22-1.png" width="576" style="display: block; margin: auto;" /&gt;
+&lt;img src="index_files/figure-html/unnamed-chunk-7-1.png" width="576" style="display: block; margin: auto;" /&gt;
 ]
 .pull-right[
 **SMOTE:** Take the minority class and generate additional synthetic samples by using *k*-NN. [[2](#references)]
@@ -240,7 +240,7 @@ The upcoming techniques address the issue of class imbalance by implementing sam
 ### 3.1.3 Borderline SMOTE
 
 .pull-left[
-&lt;img src="index_files/figure-html/unnamed-chunk-23-1.png" width="576" style="display: block; margin: auto;" /&gt;
+&lt;img src="index_files/figure-html/unnamed-chunk-8-1.png" width="576" style="display: block; margin: auto;" /&gt;
 ]
 .pull-right[
 **Three types of minority class samples:**
@@ -262,7 +262,7 @@ Borderline SMOTE focuses on uncertain samples (safe and lost samples are certain
 ### 3.1.4 Random Undersampling
 
 .pull-left[
-&lt;img src="index_files/figure-html/unnamed-chunk-24-1.png" width="576" style="display: block; margin: auto;" /&gt;
+&lt;img src="index_files/figure-html/unnamed-chunk-9-1.png" width="576" style="display: block; margin: auto;" /&gt;
 ]
 .pull-right[
 **Random undersampling:** Take all cases from the minority class in the training set and complement it by drawing random samples with replacement from the majority class.
@@ -277,7 +277,7 @@ Borderline SMOTE focuses on uncertain samples (safe and lost samples are certain
 ### 3.1.5 Informed NearMiss Undersampling 
 
 .pull-left[
-&lt;img src="index_files/figure-html/unnamed-chunk-25-1.png" width="576" style="display: block; margin: auto;" /&gt;
+&lt;img src="index_files/figure-html/unnamed-chunk-10-1.png" width="576" style="display: block; margin: auto;" /&gt;
 ]
 .pull-right[
 **Informative NearMiss undersampling:** Take only informative samples from the majority class, i.e. samples which are expected to be close to the empirical decision boundary, to improve accuracy in uncertain regions. [[4](#references)]
@@ -316,7 +316,7 @@ class: center, middle
 ### 3.2 Case Weighting (*Model Estimation*)
 
 .pull-left[
-&lt;img src="index_files/figure-html/unnamed-chunk-27-1.png" width="576" style="display: block; margin: auto;" /&gt;
+&lt;img src="index_files/figure-html/unnamed-chunk-12-1.png" width="576" style="display: block; margin: auto;" /&gt;
 ]
 .pull-right[
 Assign higher *case weights* to samples of the minority class when training the classifier.
@@ -403,7 +403,7 @@ This discrepancy between *sensitivity* and *specificity* highlights the trade-of
 ### 3.3.2 Receiver Operating Characteristic (ROC)-Curve
 
 .pull-left[
-&lt;img src="index_files/figure-html/unnamed-chunk-30-1.png" width="576" style="display: block; margin: auto;" /&gt;
+&lt;img src="index_files/figure-html/unnamed-chunk-15-1.png" width="576" style="display: block; margin: auto;" /&gt;
 ]
 .pull-right[
 **ROC-curve:** Step function created by gradually lowering (from `+inf` to `-inf`) the cutoff ( `\(c\)` ) for classifying a sample as positive. It aggregates all possible confusion matrices and creates a performance profile of the classifier. [[5](#references)]
@@ -424,13 +424,13 @@ This discrepancy between *sensitivity* and *specificity* highlights the trade-of
 ### 3.3.2 Receiver Operating Characteristic (ROC)-Curve
 
 .pull-left[
-&lt;img src="index_files/figure-html/unnamed-chunk-31-1.png" width="576" style="display: block; margin: auto;" /&gt;
+&lt;img src="index_files/figure-html/unnamed-chunk-16-1.png" width="576" style="display: block; margin: auto;" /&gt;
 ]
 .pull-right[
 **D:** A conservative classifier which only issues positive predictions with sufficient evidence (hence, producing few TP and FP).&lt;br&gt;&lt;br&gt;
 **E:** A liberal classifier which issues positive predictions more liberally (hence, producing many TP but also FP).&lt;br&gt;&lt;br&gt;
 **F:** A random classifier which issues positive predictions according to a coin-toss.&lt;br&gt;&lt;br&gt;
-**G:** Our classifier ( `\(sens=\)` 0.8889, `\(spec=\)` 0.7007) with an optimized classification cutoff ( `\(c=\)` 0.0699 ).&lt;br&gt;&lt;br&gt;
+**G:** Our classifier ( `\(sens=\)` 0.8889, `\(spec=\)` 0.7007) with an optimized cutoff ( `\(c=\)` 0.0699 ).&lt;br&gt;&lt;br&gt;
 **Lower right triangle:** A classifier that performs worse than random.
 ]
 
@@ -444,7 +444,7 @@ This discrepancy between *sensitivity* and *specificity* highlights the trade-of
 ### 3.3.2 Receiver Operating Characteristic (ROC)-Curve
 
 .pull-left[
-&lt;img src="index_files/figure-html/unnamed-chunk-32-1.png" width="576" style="display: block; margin: auto;" /&gt;
+&lt;img src="index_files/figure-html/unnamed-chunk-17-1.png" width="576" style="display: block; margin: auto;" /&gt;
 ]
 .pull-right[
 **Properties of the cutoff `\(c\)` :** In general, the variation of the cutoff does not need to adhere to predicted probabilities! Any uncalibrated score that allows to rank predictions is sufficient.
@@ -465,7 +465,7 @@ This discrepancy between *sensitivity* and *specificity* highlights the trade-of
 ### 3.3.3 Area under the ROC-Curve (ROC-AUC)
 
 .pull-left[
-&lt;img src="index_files/figure-html/unnamed-chunk-33-1.png" width="576" style="display: block; margin: auto;" /&gt;
+&lt;img src="index_files/figure-html/unnamed-chunk-18-1.png" width="576" style="display: block; margin: auto;" /&gt;
 ]
 .pull-right[
 **ROC-AUC:** Summary of the area under the ROC-curve (i.e. the integral) that allows to identify the overall best classifier independent of the cutoff `\(c\)` .
@@ -473,8 +473,6 @@ This discrepancy between *sensitivity* and *specificity* highlights the trade-of
 - Likelihood that the classifier assigns a higher score to a randomly chosen positive relative to a negative sample (*discriminatory power*).
 
 **Here:** `\(AUC(C2)=\)` 0.7382 `\(&gt;\)` `\(AUC(C1)=\)` 0.7247
-
---
 
 **Multi-class ROC-AUC:** With `\(n&gt;\)` 2 classes the problem gets more complex. Hence, alternative approaches are required:
 - One vs. rest ROC-curves
