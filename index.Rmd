@@ -110,7 +110,7 @@ knitr::include_graphics("img/class-imb.png")
 .pull-right[.footnote[
 *Note: In this workshop we focus on class imbalance in the context of classification. Most of the ideas, however, analogously transfer to the realm of regression problems where outliers reflect the minority class.*
 
-*Source: [Allison Horst](https://github.com/allisonhorst/stats-illustrations).*
+*Source: [Allison Horst](https://github.com/allisonhorst/stats-illustrations)*
 ]]
 
 ???
@@ -176,7 +176,7 @@ Let's consider the following confusion matrix which belongs to a classification 
 ```{r, echo=F, fig.align='center'}
 conf_mat
 ```
-A *naive classifier which always predicts the negative class will be correct `r round((1 - 9 / 137) * 100, 1)`% of the time. `r emo::ji('astonished')`
+A *naive classifier* which always predicts the negative class will be correct `r round((1 - 9 / 137) * 100, 1)`% of the time. `r emo::ji('astonished')`
 ]
 
 ???
@@ -311,7 +311,7 @@ model_df %>%
     theme_classic() +
     labs(
       title = "Distribution of Adelie Penguins",
-      subtitle = "SMOTE to Increase the Size of the Minority Class",
+      subtitle = "SMOTE to Increase the Size of the Minority Class (k = 3)",
       x = "Bill Length [mm]",
       y = "Bill Depth [mm]"
     ) +
@@ -361,7 +361,7 @@ model_df %>%
     theme_classic() +
     labs(
       title = "Distribution of Adelie Penguins",
-      subtitle = "Borderline SMOTE1 to Increase the Size of the Minority Class",
+      subtitle = "Borderline SMOTE1 to Increase the Size of the Minority Class (k = 2)",
       x = "Bill Length [mm]",
       y = "Bill Depth [mm]"
     ) +
@@ -468,7 +468,8 @@ model_df %>%
 ]
 
 ???
-near-miss-3: ensures surrounding and focuses on samples close to the decision boundary
+- again builds on k-NN
+- near-miss-3: ensures surrounding and focuses on samples close to the decision boundary
 
 ---
 
@@ -599,8 +600,8 @@ This discrepancy between *sensitivity* and *specificity* highlights the trade-of
 .pull-left[
 ```{r, echo=F, fig.width=8, fig.asp=0.618, fig.retina=3, fig.align='center'}
 points <- tibble(
-  one_minus_spec = c(0, 1, 0, .05, .5, .5, (1-0.78102190)),
-  sens = c(0, 1, 1, .5, .95, .5, 0.7777778),
+  one_minus_spec = c(0, 1, 0, .05, .5, .5, (1-0.70072993)),
+  sens = c(0, 1, 1, .5, .95, .5, 0.8888889),
   label = c("A", "B", "C", "D", "E", "F", "G")
 )
 
@@ -658,7 +659,7 @@ p
 **D:** A conservative classifier which only issues positive predictions with sufficient evidence (hence, producing few TP and FP).<br><br>
 **E:** A liberal classifier which issues positive predictions more liberally (hence, producing many TP but also FP).<br><br>
 **F:** A random classifier which issues positive predictions according to a coin-toss.<br><br>
-**G:** Our classifier ( $sens=$ 1, $spec=$ 0.7622) with a shifted classification cutoff ( $c=$ 0.0249 ).<br><br>
+**G:** Our classifier ( $sens=$ 0.8889, $spec=$ 0.7007) with an optimized classification cutoff ( $c=$ 0.0699 ).<br><br>
 **Lower right triangle:** A classifier that performs worse than random.
 ]
 
@@ -686,6 +687,9 @@ p
 `r emo::ji("thinking")` **What if we compare different classifiers with intersecting ROC-curves?**
 ]
 
+???
+- changing cutoffs is also referred to as post-processing
+
 ---
 
 ## 3.3 Excursus: Evaluation of Classification Models
@@ -704,8 +708,8 @@ df_b <- penguins %>%
          pred = glm(sex ~ bill_length_mm + bill_length_mm + flipper_length_mm + island, data = ., family = "binomial")$fitted.values)
    
 points <- tibble(
-  one_minus_spec = c(0.05, .4),
-  sens = c(0.5, 0.8),
+  one_minus_spec = c(.4, 0.05),
+  sens = c(0.8, 0.5),
   label = c("C1", "C2")
 )
   
@@ -740,7 +744,9 @@ ggplot() +
 - Lies on the $[0;1]$-interval (technically, $[0.5;1]$).
 - Likelihood that the classifier assigns a higher score to a randomly chosen positive relative to a negative sample (*discriminatory power*).
 
-**Here:** $AUC(C1)=$ `r df_a %>% roc_auc(truth = response, pred, event_level = "first") %>% .$.estimate %>% round(4)` $>$ $AUC(C2)=$ `r df_b %>% roc_auc(truth = response, pred, event_level = "second") %>% .$.estimate %>% round(4)`
+**Here:** $AUC(C2)=$ `r df_a %>% roc_auc(truth = response, pred, event_level = "first") %>% .$.estimate %>% round(4)` $>$ $AUC(C1)=$ `r df_b %>% roc_auc(truth = response, pred, event_level = "second") %>% .$.estimate %>% round(4)`
+
+--
 
 **Multi-class ROC-AUC:** With $n>$ 2 classes the problem gets more complex. Hence, alternative approaches are required:
 - One vs. rest ROC-curves
