@@ -3,10 +3,11 @@ title: "Machine Learning in R:<br/>Workshop Series"
 subtitle: "Imbalanced Learning"
 author: "Simon Schölzel"
 institute: "*Research Team Berens*"
-date: "2020-11-24 (updated: `r Sys.Date()`)"
+date: "2020-11-23"
 
 output:
   xaringan::moon_reader:
+    seal: false
     css: [./custom/xaringan-themer.css, ./custom/custom-theme.css]
     lib_dir: libs
     nature:
@@ -17,41 +18,75 @@ output:
       ratio: '16:9'
 ---
 
-```{r setup, include = FALSE}
+```{r setup, include=F}
+# knitr options
 knitr::opts_chunk$set(
-  #set comment formatting
   comment = ">",
-  #collapse code and output
   collapse = F
 )
-```
 
-```{r xaringan-themer, include=FALSE, warning=FALSE}
-library(xaringanthemer)
-style_mono_accent(
+# package management
+if (!require("pacman")) install.packages("pacman")
+pacman::p_load(
+  xaringanthemer, xaringanExtra, metathis,
+  renv, tidyverse, showtext, yardstick, themis
+)
+pacman::p_load_gh("allisonhorst/palmerpenguins", "hadley/emo")
+
+# xaringan custom setup
+xaringanthemer::style_mono_accent(
   base_color = "#000000",
   link_color = "#0000EE",
   header_font_google = google_font("Josefin Sans"),
-  text_font_google   = google_font("Montserrat", "700b", "400"),
-  code_font_google   = google_font("Fira Mono"),
-  colors = c(
-    red = "#ff7453",
-    yellow = "#f2bd53",
-    blue = "	#45abc1",
-    white = "#FFFFFF"
-  ),
+  text_font_google = google_font("Montserrat", "700b", "400"),
+  code_font_google = google_font("Fira Mono"),
+  colors = c(red = "#f34213", white = "#FFFFFF"),
   code_font_size = "smaller",
   code_inline_background_color = "#F4F4F4",
   outfile = "./custom/xaringan-themer.css"
 )
+
+xaringanExtra::use_panelset()
+
+xaringanExtra::use_extra_styles(
+  hover_code_line = T,
+  mute_unhighlighted_code = T
+)
+
+metathis::meta() %>%
+  meta_name("github-repo" = "simonschoe/imbalanced-learning") %>% 
+  meta_description(
+    "This 1 hour workshop serves as a gentle introduction to the field of imbalanced learning."
+  ) %>% 
+  meta_social(
+    title = "Feature Engineering",
+    url = "https://simonschoe.github.io/imbalanced-learning",
+    image =  "https://simonschoe.github.io/imbalanced-learning/img/share-card.png",
+    image_alt = "Title slide for Imbalanced Learning",
+    og_type = "website",
+    og_author = "Simon Schölzel",
+    twitter_card_type = "summary_large_image"
+  )
 ```
 
-```{r packages, warning=F, message=F, echo=F}
-#install.packages("pacman")
-if (!require("pacman")) install.packages("pacman")
-pacman::p_load(tidyverse, showtext, yardstick, themis)
-pacman::p_load_gh("allisonhorst/palmerpenguins", "hadley/emo")
-```
+class: center, middle, hide-count
+count: false
+
+# `r rmarkdown::metadata$title`
+### `r rmarkdown::metadata$subtitle`
+
+___
+
+**`r rmarkdown::metadata$author`**
+
+`r rmarkdown::metadata$date`  
+.small[(updated: 2020-12-30)]
+
+<br><br>
+
+<a href="https://www.wiwi.uni-muenster.de/"><img src="https://www.wiwi.uni-muenster.de/fakultaet/sites/all/themes/wwucd/assets/images/logos/secondary_wiwi_aacsb_german.jpg" alt="fb4-logo" height="45"></a> <a href="https://www.wiwi.uni-muenster.de/ctrl/aktuelles"><img src="https://www.wiwi.uni-muenster.de/ctrl/sites/all/themes/wwucd/assets/images/logos/berenslogo5.jpg" alt="ftb-logo" height="45"></a> <a href="https://www.wiwi.uni-muenster.de/iff2/de/news"><img src="https://www.wiwi.uni-muenster.de/iff2/sites/all/themes/wwucd/assets/images/logos/logo_iff2_en2.jpg" alt="ipb-logo" height="45"></a>
+
+---
 
 name: agenda
 
@@ -422,7 +457,7 @@ model_df %>%
 ```
 ]
 .pull-right[
-**Random undersampling:** Take all cases from the minority class in the training set and complement it by drawing random samples with replacement from the majority class.
+**Random undersampling:** Take all cases from the minority class in the training set and complement it by drawing random samples without replacement from the majority class.
 - The training set size is determined by the size of the minority class.
 - The classifier extracts information only from a subset of all available samples.
 - Deletion of potentially informative samples.
@@ -635,8 +670,8 @@ p
 .pull-right[
 **ROC-curve:** Step function created by gradually lowering (from `+inf` to `-inf`) the cutoff ( $c$ ) for classifying a sample as positive. It aggregates all possible confusion matrices and creates a performance profile of the classifier. [[5](#references)]
 
-**A:** Our classifier ( $sens=$ 0, $spec=$ 1) which never issues positive predictions ( $c=$ 0.5 ).<br><br>
-**B:** The opposite classifier which only issues positive predictions.<br><br>
+**A:** Our (naive) classifier ( $sens=$ 0, $spec=$ 1) which never issues positive predictions ( $c=$ 0.5 ).<br><br>
+**B:** The opposite (naive) classifier which only issues positive predictions.<br><br>
 **C:** The perfect classifier which always predicts the class correctly.
 ]
 
